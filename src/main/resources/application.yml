@@ -1,0 +1,25 @@
+spring:
+    cloud:
+        stream:
+            kafka:
+                binder:
+                    brokers: localhost
+                    zk-nodes: localhost
+                    minPartitionCount: 3
+                    autoCreateTopics: true
+                bindings:
+                    messagingInput:
+                        consumer:
+                            enableDlq: true
+                            ackEachRecord: true
+                            dlqName: dev.dlq-messaging-topic #DLQ topic when consumer has exception
+            binders:
+                messagingInput:
+                    destination: dev.messaging-topic # topic name env.scheme.action
+                    group: dev.messaging
+                    consumer:
+                        maxAttempts: 3 # perform 3 retries
+                        backOffInitialInterval: 3000 # the interval is 3s between each time retrying
+                        backOffMaxInterval: 15000 # the max interval is not over 15s between each time retrying
+server:
+    port: 8081
